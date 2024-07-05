@@ -36,9 +36,13 @@ const express = require('express');
 const axios = require('axios');
 const app = express();
 const PORT = process.env.PORT || 3000;
+const requestIp = require('request-ip');
+
+app.use(requestIp.mw());
 
 app.get('/api/hello', async (req, res) => {
-  const visitorName = req.query.visitor_name || 'Guest';
+ let visitorName = req.query.visitor_name || 'Guest';
+  visitorName = visitorName.replace(/["']/g, "");
 
   // Get client IP address
   const clientIp = req.headers['x-real-ip'] || req.socket.remoteAddress;
@@ -71,7 +75,7 @@ app.get('/api/hello', async (req, res) => {
     res.json({
       client_ip: clientIp,
       location: location,
-      greeting: `Hello, ${visitorName}!, the temperature is ${temperature} degrees Celsius in ${location}`
+      greeting: `Hello,` + visitorName + `!, the temperature is ${temperature} degrees Celsius in ${location}`
     });
   } catch (error) {
     console.error(error);
